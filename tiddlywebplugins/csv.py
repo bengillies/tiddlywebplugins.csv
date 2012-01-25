@@ -76,7 +76,7 @@ class Serialization(SerializationInterface):
         for name in self.header:
             value = getattr(tiddler, name, '')
             if name == 'tags':
-                value = self._tags_to_string(value)
+                value = self.tags_as(value)
             tiddler_body.append(value)
 
         for name in fields:
@@ -85,17 +85,6 @@ class Serialization(SerializationInterface):
 
         return tiddler_body
 
-    def _tags_to_string(self, tags):
-        """
-        turn a list of tags into a string
-        """
-        value = ''
-        for tag in tags:
-            if tag.count(' ') > 0:
-                value += ' [[%s]]' % tag
-            else:
-                value += ' %s' % tag
-        return value.strip(' ')
 
 
 def init(config):
