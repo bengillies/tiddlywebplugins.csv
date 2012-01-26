@@ -37,8 +37,17 @@ def test_tiddler_to_csv():
 
     assert string == expected_string
 
+def test_unicode_tiddler_to_csv():
+    expected_string = 'title,text,modifier,creator,revision,bag,tags,two\r\nbar,Lorem Ipsum Dolor Sit \xe2\x99\xa5,alice,alice,0,,[[foo baz]] biz bix,2\r\n'
+    serializer = Serializer('tiddlywebplugins.csv', environ=environ)
+    tiddler = [t for t in tiddlers if t.title == 'bar'][0]
+    serializer.object = tiddler
+    string = serializer.to_string()
+
+    assert string == expected_string
+
 def test_tiddlers_to_csv():
-    expected_string = 'title,text,modifier,creator,revision,bag,tags,one,two,three\r\nfoo,Hello There!,bob,bob,0,,foo bar baz,1,,\r\nbar,Lorem Ipsum Dolor Sit Amet,alice,alice,0,,[[foo baz]] biz bix,,2,\r\nbaz,Goodbye,Steve,Steve,0,,,1,,3\r\nbiz,"Some text, here",Bill,Bill,0,,foo biz bix,1,,\r\n'
+    expected_string = 'title,text,modifier,creator,revision,bag,tags,one,two,three\r\nfoo,Hello There!,bob,bob,0,,foo bar baz,1,,\r\nbar,Lorem Ipsum Dolor Sit \xe2\x99\xa5,alice,alice,0,,[[foo baz]] biz bix,,2,\r\nbaz,Goodbye,Steve,Steve,0,,,1,,3\r\nbiz,"Some text, here",Bill,Bill,0,,foo biz bix,1,,\r\n'
     serializer = Serializer('tiddlywebplugins.csv', environ=environ)
     string = serializer.list_tiddlers(tiddlers)
 

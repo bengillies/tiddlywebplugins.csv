@@ -11,7 +11,7 @@ test_tiddlers = [
         }
     }"""),
     ('bar', """{
-        "text": "Lorem Ipsum Dolor Sit Amet",
+        "text": "Lorem Ipsum Dolor Sit \xe2\x99\xa5",
         "tags": ["foo baz", "biz", "bix"],
         "modifier": "alice",
         "fields": {

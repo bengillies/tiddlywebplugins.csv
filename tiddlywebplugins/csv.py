@@ -39,6 +39,7 @@ class Serialization(SerializationInterface):
         fields = [f for f in tiddler.fields.iterkeys()]
         tiddler_body = self._tiddler_list(tiddler, fields)
         tiddler_header.extend(fields)
+        tiddler_header = [h.encode('utf-8') for h in tiddler_header]
 
         csv_writer.writerow(tiddler_header)
         csv_writer.writerow(tiddler_body)
@@ -61,6 +62,7 @@ class Serialization(SerializationInterface):
             tiddler_rows.append(self._tiddler_list(tiddler, fields))
 
         tiddler_header.extend(fields)
+        tiddler_header = [h.encode('utf-8') for h in tiddler_header]
         csv_writer.writerow(tiddler_header)
         [csv_writer.writerow(tiddler) for tiddler in tiddler_rows]
 
@@ -72,16 +74,22 @@ class Serialization(SerializationInterface):
         turn a tiddler into a list
         given the tiddler and a list of fields to include
         """
+        def _handle_unicode(val):
+            if isinstance(val, unicode):
+                return val.encode('utf-8')
+            else:
+                return val
+
         tiddler_body = []
         for name in self.header:
             value = getattr(tiddler, name, '')
             if name == 'tags':
                 value = self.tags_as(value)
-            tiddler_body.append(value)
+            tiddler_body.append(_handle_unicode(value))
 
         for name in fields:
             value = tiddler.fields.get(name, '')
-            tiddler_body.append(value)
+            tiddler_body.append(_handle_unicode(value))
 
         return tiddler_body
 
