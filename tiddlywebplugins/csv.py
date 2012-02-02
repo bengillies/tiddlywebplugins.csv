@@ -22,6 +22,8 @@ class Serialization(SerializationInterface):
     header = [
         'title',
         'text',
+        'modified',
+        'created',
         'modifier',
         'creator',
         'revision',
