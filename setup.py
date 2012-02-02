@@ -3,7 +3,7 @@ AUTHOR = 'Ben Gillies'
 AUTHOR_EMAIL = 'bengillies@gmail.com'
 NAME = 'tiddlywebplugins.csv'
 DESCRIPTION = 'A csv serializer for TiddlyWeb'
-VERSION = '0.3'
+VERSION = '0.4'
 
 
 import os
