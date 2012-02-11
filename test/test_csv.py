@@ -6,7 +6,6 @@ from tiddlyweb.serializer import Serializer
 from tiddlyweb.model.tiddler import Tiddler
 from tiddlyweb.model.collections import Tiddlers
 from tiddlyweb.config import config
-from tiddlyweb.util import merge_config
 
 from tiddlywebplugins.csv import Serialization as csv, init
 

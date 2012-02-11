@@ -3,17 +3,31 @@ A csv serialization for TiddlyWeb
 """
 from __future__ import absolute_import
 from tiddlyweb.serializations import SerializationInterface
+from tiddlyweb.manage import make_command
+from tiddlywebplugins.utils import get_store
+from tiddlyweb.util import binary_tiddler
+from tiddlyweb.store import StoreError
+from tiddlyweb.model.bag import Bag
+from tiddlyweb.model.tiddler import Tiddler, string_to_tags_list
+from uuid import uuid4
 
-from csv import writer
+import sys
+from csv import writer, DictReader
+
+# XXX combine with header some?
+CORE_TIDDLER_ATTRS = ['text', 'tags', 'type', 'modified', 'modifier']
 
 class TiddlerWriter(object):
     """
     an object suitable for passing in to the csv writer
     """
-    output = ''
+
+    def __init__(self):
+        self.output = ''
 
     def write(self, output):
         self.output += output
+
 
 class Serialization(SerializationInterface):
     """
@@ -100,3 +114,41 @@ class Serialization(SerializationInterface):
 def init(config):
     config['serializers']['text/csv'] = ['tiddlywebplugins.csv', 'text/csv; charset=UTF-8']
     config['extension_types']['csv'] = 'text/csv'
+
+    @make_command()
+    def csvimport(args):
+        """Import a csv file as tiddlers."""
+        store = get_store(config)
+        try:
+            bag_name = args[0]
+            bag = store.get(Bag(bag_name))
+        except IndexError:
+            usage('you must include a bag name')
+        except StoreError:
+            usage('bag %s does not exist' % bag_name)
+        tiddler_reader = DictReader(sys.stdin)
+        for tiddler_data in tiddler_reader:
+            try:
+                title = tiddler_data['title']
+                del tiddler_data['title']
+            except KeyError:
+                title = str(uuid4())
+            tiddler = Tiddler(title, bag_name)
+
+            for key, value in tiddler_data.iteritems():
+                if key is None:
+                    continue
+                if key == 'tags':
+                    value = string_to_tags_list(value)
+                if key in CORE_TIDDLER_ATTRS:
+                    setattr(tiddler, key, value)
+                else:
+                    tiddler.fields[key] = value
+                if binary_tiddler(tiddler):
+                    try:
+                        tiddler.text = b64decode(tiddler.text)
+                    except TypeError, exc:
+                        raise TiddlerFormatError(
+                                'unable to decode b64 tiddler: %s: %s'
+                                % (tiddler.title, exc))
+            store.put(tiddler)
