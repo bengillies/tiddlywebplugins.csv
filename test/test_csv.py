@@ -6,20 +6,12 @@ from tiddlyweb.serializer import Serializer
 from tiddlyweb.model.tiddler import Tiddler
 from tiddlyweb.model.collections import Tiddlers
 from tiddlyweb.config import config
-from tiddlyweb.util import merge_config
 
-from tiddlywebplugins.csv import Serialization as csv
+from tiddlywebplugins.csv import Serialization as csv, init
 
 def setup_module(module):
-    csv_config = merge_config(config, {
-        'serializers': {
-            'text/csv': ['tiddlywebplugins.csv', 'text/csv; charset=UTF-8']
-        },
-        'extension_types': {
-            'csv': 'text/csv'
-        }
-    })
-    module.environ = { 'tiddlyweb.config': csv_config }
+    init(config)
+    module.environ = { 'tiddlyweb.config': config }
     serializer = Serializer('json')
     module.tiddlers = Tiddlers()
     for title, json in test_tiddlers:
